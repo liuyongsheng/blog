@@ -1,23 +1,23 @@
 <!--
 author: liuys
 date: 2016-05-03
-title: OS X 安装oracle数据库
+title: OS X 安装Oracle数据库
 tags: Oracle
-category: docker
+category: Docker
 status: publish
 summary: docker简单的理解就是将你的应用程序及其依赖的环境打包成镜像（可以想象成Class），在运行应用时，需要基于镜像文件生成容器（可以想象成类实例），如果你对容器进行修改是不会对镜像有任何影响的（可以想象成设置属性值），只有在commit容器的时候，才会对镜像照成影响，当然你也可以对镜像打上标签，运行应用时可以选择任意版本的镜像。
 只有原生的linux内核才支持docker，其基本原理是基于linux的cgroup进行管理，有兴趣的同学可以深入学习下；OS X和windows运行docker需要运行一个linux虚拟机，然后通过原生的docker客户端和虚拟机内核进行通讯，来达到“用户体验一样”的效果。
 -->
-如果你想在OS X上安装oracle，但又不想破坏osx系统的配置，那么使用docker安装是再合适不过的了，当然也可以使用虚拟机安装，收费的有VMware Fusion、Parallels Desktop，开源的有Oracle公司的VirtualBox等，当然这几种产品各有特长，看个人喜好，本文介绍重点是使用docker进行安装。
+如果你想在OS X上安装Oracle，但又不想破坏OS X系统的配置，那么使用docker安装是再合适不过的了，当然也可以使用虚拟机安装，收费的有VMware Fusion、Parallels Desktop等，开源的有Oracle公司的VirtualBox等，当然这几种产品各有特长，看个人喜好，本文介绍重点是使用docker进行安装。
 #### 一、docker 入门
-docker简单的理解就是将你的应用程序及其依赖的环境打包成镜像（可以想象成Class），在运行应用时，需要基于镜像文件生成容器（可以想象成类实例），如果你对容器进行修改是不会对镜像有任何影响的（可以想象成设置属性值），只有在commit容器的时候，才会对镜像照成影响，当然你也可以对镜像打上标签，运行应用时可以选择任意版本的镜像。
-只有原生的linux内核才支持docker，其基本原理是基于linux的cgroup进行管理，有兴趣的同学可以深入学习下；OS X和windows运行docker需要运行一个linux虚拟机，然后通过原生的docker客户端和虚拟机内核进行通讯，来达到“用户体验一样”的效果。
+docker简单的理解就是将你的应用程序及其依赖的环境打包成镜像（可以想象成Class），在运行应用时，需要基于镜像文件生成容器（可以想象成类实例），如果你对容器进行修改是不会对镜像有任何影响的（可以想象成设置属性值），只有在`commit`容器的时候，才会对镜像造成影响，当然你也可以对镜像打上标签，运行应用时可以选择任意版本的镜像。
+只有原生的Linux内核才支持docker，其基本原理是基于linux的cgroup进行管理，有兴趣的同学可以深入学习下；OS X和Windows运行docker需要运行一个Linux虚拟机，然后通过原生的docker客户端和虚拟机内核进行通讯，来达到“用户体验一样”的效果。
 OS X安装docker，推荐使用`brew`来进行安装
 
 ```sh
 brew install docker
 ```
-当然这个还只是一个客户端，那么服务端应该怎么安装呢？推荐使用`docker-machine`，顾名思义就是创建`docker`的机器，也确实如其名，通过如下命令就可以创建一个运行linux内核的`docker`虚拟机。
+当然这个还只是一个客户端，那么服务端应该怎么安装呢？推荐使用`docker-machine`，顾名思义就是创建`docker`的机器，也确实如其名，下面简单介绍`docker-machine`。
 
 #### 二、docker-machine 入门
 ```sh
@@ -31,13 +31,14 @@ docker-machine create -d virtualbox default
 brew install xhyve docker-machine-driver-xhyve
 docker-machine create -d xhyve oracle --xhyve-experimental-nfs-share=true
 ```
-我们又创建了一台名字叫做oracle的docker虚拟机，创建完成后，执行一下`eval $(docker-machine env oracle)`将设置当前命令行窗口的环境，然后你就可以使用`docker images`来列出当前机器中所拥有的镜像了，运行一个hello word 试试
+我们又创建了一台名字叫做oracle的docker虚拟机，命令中设置了`xhyve-experimental-nfs-share=true`，这个参数的作用是对宿主机共享目录的控制，默认为`false`，默认情况下，你不能使用`docker run -v `参数来指定卷目录；创建完成后，执行一下`eval $(docker-machine env oracle)`将设置当前命令行窗口的环境，然后你就可以使用`docker images`来列出当前机器中所拥有的镜像了，运行一个Hello Word 试试
 
 ```sh
-docker run centos echo hello word
+docker run centos echo Hello Word
 ```
-看一看控制台是不是输出了hello word，执行这一句命令，首先docker会从本地寻找centos镜像，如果本地没有，它会去docker公共的镜像库中下载一个，当然你懂得这个下载异常的慢；OK，基础环境搭建完毕了，那么我们开始安装oracle！
-#### 三、安装oracle
+看一看控制台是不是输出了Hello Word，执行这一句命令，首先docker会从本地寻找centos镜像，如果本地没有，它会去docker公共的镜像库中下载一个，当然你懂的，这个下载异常的慢；OK，基础环境搭建完毕了，那么我们开始安装Oracle！
+
+#### 三、安装Oracle
 使用docker安装oracle，网上有现成的oracle镜像，但是镜像文件太大，并且oracle的设置不一定满足你的要求，下载完了后还需要再进行修改，并且不能定制，后面会提到！
 首先下载[这个项目](https://github.com/jaspeen/oracle-11g.git)，当然熟悉了DockerFile之后，你也可以自己写，分析了作者的源代码，这个就是一个引导安装oracle的DockerFile，使用静默安装，可以安装你想要的Oracle版本，你也可以修改代码内容，定制你需要安装的Oracle；首先要按照这个项目build一个docker镜像出来
 
