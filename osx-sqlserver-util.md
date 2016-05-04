@@ -1,7 +1,7 @@
 <!--
 author: liuys
 date: 2016-04-24
-title: OS X 备份还原SQLServer数据库
+title: OS X 备份还原SQLServer
 tags: SQLServer
 category: SQL
 status: publish

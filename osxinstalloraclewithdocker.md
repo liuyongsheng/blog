@@ -1,7 +1,7 @@
 <!--
 author: liuys
 date: 2016-05-03
-title: OS X 安装Oracle数据库
+title: OS X 安装Oracle
 tags: Oracle
 category: Docker
 status: publish
