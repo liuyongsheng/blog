@@ -5,8 +5,8 @@ title: OS X 安装Oracle
 tags: Oracle
 category: Docker
 status: publish
-summary: docker简单的理解就是将你的应用程序及其依赖的环境打包成镜像（可以想象成Class），在运行应用时，需要基于镜像文件生成容器（可以想象成类实例），如果你对容器进行修改是不会对镜像有任何影响的（可以想象成设置属性值），只有在commit容器的时候，才会对镜像照成影响，当然你也可以对镜像打上标签，运行应用时可以选择任意版本的镜像。
-只有原生的linux内核才支持docker，其基本原理是基于linux的cgroup进行管理，有兴趣的同学可以深入学习下；OS X和windows运行docker需要运行一个linux虚拟机，然后通过原生的docker客户端和虚拟机内核进行通讯，来达到“用户体验一样”的效果。
+summary: docker简单的理解就是将你的应用程序及其依赖的环境打包成镜像（可以想象成Class），在运行应用时，需要基于镜像文件生成容器（可以想象成类实例），如果你对容器进行修改是不会对镜像有任何影响的（可以想象成设置属性值），只有在`commit`容器的时候，才会对镜像造成影响，当然你也可以对镜像打上标签，运行应用时可以选择任意版本的镜像。
+只有原生的Linux内核才支持docker，其基本原理是基于linux的cgroup进行管理，有兴趣的同学可以深入学习下；OS X和Windows运行docker需要运行一个Linux虚拟机，然后通过原生的docker客户端和虚拟机内核进行通讯，来达到“用户体验一样”的效果。
 -->
 如果你想在OS X上安装Oracle，但又不想破坏OS X系统的配置，那么使用docker安装是再合适不过的了，当然也可以使用虚拟机安装，收费的有VMware Fusion、Parallels Desktop等，开源的有Oracle公司的VirtualBox等，当然这几种产品各有特长，看个人喜好，本文介绍重点是使用docker进行安装。
 #### 一、docker 入门
@@ -22,7 +22,7 @@ brew install docker
 #### 二、docker-machine 入门
 ```sh
 brew install docker-machine
-docker-machine create -d virtualbox default 
+docker-machine create -d virtualbox default
 ```
 这样就创建了一个名字是default的`docker`机器，是基于VirtualBox的，当然你也可以使用其他公司的虚拟化产品，但是需要下载相应的驱动，`docker-machine`集成了常见虚拟机的驱动，记得之前使用的VMware Fusion创建的虚拟机还需要下载单独的驱动，近期的版本都不需要了，应该是官方集成了，官方支持的驱动列表在[这里](https://github.com/docker/machine/tree/master/drivers)；本文使用开源、短小精悍的虚拟化产品`xhyve`，项目主页在[这里](https://github.com/mist64/xhyve.git)，高端大气上档次，如果你不想再安装一个虚拟机产品，那么这个就是最好的选择，那么开工！
 首先下载`xhyve`源码，编译、安装，安装后就一个命令文件，大小只有210k，推荐使用brew安装，同时安装`docker-machine`驱动
@@ -46,7 +46,7 @@ docker run centos echo Hello Word
 $ git clone https://github.com/jaspeen/oracle-11g.git
 $ cd <your_file_path>/oracle-11g
 $ docker build -t oracle_base .
-$ docker images 
+$ docker images
 REPOSITORY      TAG               IMAGE ID          CREATED             SIZE
 oracle_base    latest             602ff20c5416      4 hours ago         337.9 MB
 ```
@@ -108,4 +108,3 @@ docker run -idt -p 1521:1521 -v <your_data_path>/data:/opt/oracle/oradata --name
 注：笔者在这样设置后，遇到了一个问题，安装oracle后，一共生成了两个控制文件，一个在`/opt/oracle/oradata`目录，也就是映射到宿主机上的，另外一个在容器`${ORACLE_HOME}/flash_recovery_area/orcl`目录下面，如果你创建了数据，并且删除了容器，再用`oracle11g-installed`这个镜像运行容器时oracle会起不来，原因是，两个控制文件不一致照成的，最简单的办法是安装好oracle后，将容器中的控制文件移到`/opt/oracle/oradata`目录中，也确实应该这样做！
 
 全文完，转载请注明出处！
-
